@@ -13,6 +13,19 @@ std::string Demon::GetTxJsonFromMempool(CTransaction& tx) {
     return write_string(Value(objTx), false) + "\n";
 }
 
+std::string Demon::GetBlock(const CBlock& block, const CBlockIndex* blockindex, bool txDetails) {
+    objBlock = blockToJSON(block, blockindex, txDetails);
+    return write_string(Value(objBlock), false) + "\n";
+}
+
+std::string Demon::GetBlockDetail(const CBlock& block, const CBlockIndex* blockindex) {
+    return GetBlock(block, blockindex, true);
+}
+
+bool Demon::ReadBlockFromDisk(CBlock& block, CBlockIndex* blockindex) {
+    return ::ReadBlockFromDisk(block, blockindex);
+}
+
 Demon::~Demon() {
 
 }

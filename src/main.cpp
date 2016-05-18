@@ -1107,11 +1107,11 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
             return error("AcceptToMemoryPool: : BUG! PLEASE REPORT THIS! ConnectInputs failed against MANDATORY but not STANDARD flags %s", hash.ToString());
         }
         
-        // Transaction is checked
-        Demon deamonHook;
+        // Show transaction which will be pushed to mempool
+        Demon demonTx;
         CTransaction tx;
         tx = entry.GetTx();
-        std::cout << deamonHook.GetTxJsonFromMempool(tx);
+        std::cout << demonTx.GetTxJsonFromMempool(tx);
        
         // Store transaction in memory
         pool.addUnchecked(hash, entry);
@@ -1909,10 +1909,25 @@ void static UpdateTip(CBlockIndex *pindexNew) {
     nTimeBestReceived = GetTime();
     mempool.AddTransactionsUpdated(1);
 
+    /*
     LogPrintf("UpdateTip: new best=%s  height=%d  log2_work=%.8g  tx=%lu  date=%s progress=%f  cache=%u\n",
       chainActive.Tip()->GetBlockHash().ToString(), chainActive.Height(), log(chainActive.Tip()->nChainWork.getdouble())/log(2.0), (unsigned long)chainActive.Tip()->nChainTx,
       DateTimeStrFormat("%Y-%m-%d %H:%M:%S", chainActive.Tip()->GetBlockTime()),
       Checkpoints::GuessVerificationProgress(chainActive.Tip()), (unsigned int)pcoinsTip->GetCacheSize());
+     */
+    
+    //Show new block
+    CBlock block;
+
+    //Get latest block
+    CBlockIndex* pBlockIndex = chainActive.Tip();
+    Demon demonBlock;
+    std::cout << "Try to locate: " << pBlockIndex->GetBlockHash().ToString() << std::endl;
+    if (demonBlock.ReadBlockFromDisk(block, pBlockIndex)) {
+        std::cout << demonBlock.GetBlockDetail(block, pBlockIndex) << std::endl;
+    } else {
+        std::cout << "Block not found" << std::endl;
+    }
 
     cvBlockChange.notify_all();
 
