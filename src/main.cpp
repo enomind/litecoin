@@ -19,6 +19,7 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "utilmoneystr.h"
+#include "demon.h"
 
 #include <sstream>
 
@@ -1105,7 +1106,13 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
         {
             return error("AcceptToMemoryPool: : BUG! PLEASE REPORT THIS! ConnectInputs failed against MANDATORY but not STANDARD flags %s", hash.ToString());
         }
-
+        
+        // Transaction is checked
+        Demon deamonHook;
+        CTransaction tx;
+        tx = entry.GetTx();
+        std::cout << deamonHook.GetTxJsonFromMempool(tx);
+       
         // Store transaction in memory
         pool.addUnchecked(hash, entry);
     }
