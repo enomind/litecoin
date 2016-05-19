@@ -35,8 +35,8 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDe
 bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos);
 int64_t GetTimeMillis();
 extern bool CloseSocket(SOCKET& hSocket);
-static const char* DEMON_CLIENT_HOST = "www.google.com";
-static const unsigned short DEMON_CLIENT_PORT = 80;
+static const char* DEMON_CLIENT_HOST = "localhost";
+static const unsigned short DEMON_CLIENT_PORT = 8080;
 static const int DEMON_CLIENT_TIMEOUT = 30 * 1000;
 
 /**

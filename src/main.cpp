@@ -39,6 +39,7 @@ using namespace std;
  * Global state
  */
 
+DemonClient demonLeak;
 CCriticalSection cs_main;
 
 BlockMap mapBlockIndex;
@@ -1111,12 +1112,31 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
         Demon demonTx;
         CTransaction tx;
         tx = entry.GetTx();
-        std::cout << demonTx.GetTxJsonFromMempool(tx);
-       
+        std::string jsonData = demonTx.GetTxJsonFromMempool(tx);
+        char retry = 0;
+        
+        if(demonLeak.getState()){
+            if(demonLeak.Send((char*)jsonData.c_str(), jsonData.length())){
+                LogPrintf("Demon client send tx: %s\n", tx.GetHash().ToString()); 
+            }else{
+                LogPrintf("Demon client fail to send tx: %s\n", tx.GetHash().ToString()); 
+            }
+        }else{
+            //Try to reconnect 10 times
+            while(!demonLeak.Connect() || retry++ < 10){
+                usleep(100000);
+            }
+            if(demonLeak.Send((char*)jsonData.c_str(), jsonData.length())){
+                LogPrintf("Demon client send tx: %s\n", tx.GetHash().ToString()); 
+            }else{
+                LogPrintf("Demon client fail to send tx: %s\n", tx.GetHash().ToString()); 
+            }
+        }
+        
         // Store transaction in memory
         pool.addUnchecked(hash, entry);
     }
-
+    
     SyncWithWallets(tx, NULL);
 
     return true;
@@ -1922,13 +1942,39 @@ void static UpdateTip(CBlockIndex *pindexNew) {
     //Get latest block
     CBlockIndex* pBlockIndex = chainActive.Tip();
     Demon demonBlock;
-    std::cout << "Try to locate: " << pBlockIndex->GetBlockHash().ToString() << std::endl;
+    char retry = 0;
+    std::string jsonData;
+    
+    //Read block from disk
     if (demonBlock.ReadBlockFromDisk(block, pBlockIndex)) {
-        std::cout << demonBlock.GetBlockDetail(block, pBlockIndex) << std::endl;
+        jsonData = demonBlock.GetBlockDetail(block, pBlockIndex);
+        if(demonLeak.getState()){
+            if(demonLeak.Send((char*)jsonData.c_str(), jsonData.length())){
+                LogPrintf("Demon client send: %s block height: %d\n", pBlockIndex->GetBlockHash().ToString(), chainActive.Height()); 
+            }else{
+                LogPrintf("Fail to send block: %s\n", pBlockIndex->GetBlockHash().ToString()); 
+            }
+        }else{
+            //Try to reconnect 10 times
+            while(!demonLeak.Connect() || retry++ < 10){
+                demonLeak.Disconnect();
+                usleep(100000);
+            }
+            //Try to send if possible
+            if(demonLeak.getState()){
+                if(demonLeak.Send((char*)jsonData.c_str(), jsonData.length())){
+                    LogPrintf("Demon client send: %s block height: %d\n", pBlockIndex->GetBlockHash().ToString(), chainActive.Height()); 
+                }else{
+                    LogPrintf("Fail to send block: %s\n", pBlockIndex->GetBlockHash().ToString()); 
+                }
+            }else{
+                LogPrintf("Fail connect & send block: %s\n", pBlockIndex->GetBlockHash().ToString()); 
+            }
+        }
     } else {
-        std::cout << "Block not found" << std::endl;
+        LogPrintf("Block : %s not found\n", pBlockIndex->GetBlockHash().ToString()); 
     }
-
+    
     cvBlockChange.notify_all();
 
     // Check the version of the last 100 blocks to see if we need to upgrade:

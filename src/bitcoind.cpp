@@ -10,7 +10,6 @@
 #include "noui.h"
 #include "ui_interface.h"
 #include "util.h"
-#include "demon.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
@@ -178,54 +177,6 @@ bool AppInit(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    DemonClient test;
-    if(test.getState()){
-        std::cout << "Connected 1\n";
-    }else{
-        std::cout << "Not connected 2\n";
-    }
-    
-    if(test.Connect()){
-        std::cout << "Connected 3\n";
-    }else{
-        std::cout << "Not connected 4\n";
-    }
-    
-    if(test.getState()){
-        std::cout << "Connected 5\n";
-    }else{
-        std::cout << "Not connected 6\n";
-    }
-    
-    std::string data("GET / HTTP/1.1\r\nHost: www.google.com\r\n\r\n");
-    
-    if(test.Send((char*)data.c_str(), data.length())){
-        std::cout << "Send\n";
-        char *buffer = NULL;
-        buffer = new char[4096];
-
-        test.Recv(buffer, 4096);
-
-        std::cout << buffer << std::endl;
-    }else{
-        std::cout << "Send fail\n";
-    }
-    
-    
-    
-    if(test.Disconnect()){
-        std::cout << "Disconnected 7\n";
-    }else{
-        std::cout << "Fail 8\n";
-    }    
-    
-    if(test.getState()){
-        std::cout << "Connected 9\n";
-    }else{
-        std::cout << "Not connected 10\n";
-    }
-    
-    return 0;
     SetupEnvironment();
 
     // Connect bitcoind signal handlers
