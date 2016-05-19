@@ -139,7 +139,8 @@ BITCOIN_CORE_H = \
   wallet.h \
   wallet_ismine.h \
   walletdb.h \
-  compat/sanity.h
+  compat/sanity.h \
+  demon.h
 
 JSON_H = \
   json/json_spirit.h \
@@ -185,6 +186,7 @@ libbitcoin_server_a_SOURCES = \
   timedata.cpp \
   txdb.cpp \
   txmempool.cpp \
+  demon.cpp \
   $(JSON_H) \
   $(BITCOIN_CORE_H)
 
