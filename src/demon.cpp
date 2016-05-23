@@ -1,4 +1,5 @@
-// Copyright (c) 2016 Cardano Labo <dungta@cardano-labo.com>
+// Copyright (c) 2016 Cardano Labo
+// Copyright (c) 2016 Dung Tran <tad88.dev@gmail.com>
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
